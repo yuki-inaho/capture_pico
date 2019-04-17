@@ -1,0 +1,22 @@
+####################################
+###  パラメータ設定ファイル            ###
+####################################
+
+### カメラ設定
+[Camera]
+###Pico Monstar
+# カメラ画像の横サイズ
+#image_width = 352 # int
+# カメラ画像の縦サイズ
+#image_height = 287 # int
+#capture_fps = 30 # int
+#sensor_id="0006-3904-0016-1711"
+
+###Pico Flexx
+# カメラ画像の横サイズ
+image_width = 224 # int
+# カメラ画像の縦サイズ
+image_height = 171 # int
+capture_fps = 30 # int
+sensor_id = "0007-0306-0107-0111"
+
