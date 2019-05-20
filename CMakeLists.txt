@@ -1,20 +1,42 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 # project set
-set(PROJ_NAME capture_pico_zense)
+set(PROJ_NAME capture_zense)
 project(${PROJ_NAME})
-add_executable(
-    ${PROJ_NAME} 
-    src/main.cpp
-    src/PicoZenseSensorClass.cpp
-    src/PicoZenseSetter.cpp
-    src/ParameterManager.cpp
-    src/SensorManager.cpp
+set(SOURCE_CODE
+        src/main.cpp
+        src/PicoZenseSensorClass.cpp
+        src/PicoZenseSetter.cpp
+        src/ParameterManager.cpp
+        src/SensorManager.cpp
     )
 
 set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
 
-include_directories(include)
+find_package(catkin REQUIRED COMPONENTS
+        roscpp
+        rospy
+        std_msgs
+        rosbag
+        cv_bridge
+        )
+
+catkin_package(
+        INCLUDE_DIRS include
+        CATKIN_DEPENDS roscpp rospy std_msgs rosbag cv_bridge
+)
+
+include_directories(
+        include
+        ${catkin_INCLUDE_DIRS}
+)
+
+add_executable(capture_zense ${SOURCE_CODE})
+
+add_dependencies(capture_zense ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(capture_zense
+        ${catkin_LIBRARIES}
+        )
 
 find_package(PkgConfig REQUIRED)
 

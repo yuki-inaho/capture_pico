@@ -1,3 +1,14 @@
+# memo
+
+- rosbag保存機能を作成中
+- ビルドはcatkin_makeでお願いします
+
+## 実行
+- roscoreが必要です
+- アプリ実行時に引数「rosbag」を与えるとrosbag保存モードになります
+- アプリ実行時に引数「1shot」と入力すると従来の1枚撮影モードになります
+
+
 # 機能
 * 対となるRGB/Depth画像を撮影ボタンを押す毎に「capture_tmp」に順次保存  
 (RgbDepth,点群pcdデータも追加で保存)
