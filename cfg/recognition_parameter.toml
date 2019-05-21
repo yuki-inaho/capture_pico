@@ -28,3 +28,8 @@ rgb_map = true
 #depth_map = true
 depth_map = false
 
+[BugReadOption]
+
+bug_file_path = "../capture_tmp/bag_0000.bag"
+start_frame = 0
+end_frame = 500

@@ -22,7 +22,8 @@
 #include <rosbag/bag.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-
+#include <rosbag/view.h>
+#include <std_msgs/Int32.h>
 
 using namespace std;
 using namespace cv;
@@ -33,6 +34,7 @@ std::string CFG_PARAM_PATH = HOME_PATH + "/catkin_ws/src/capture_zense/cfg/recog
 // One (and only one) of your C++ files must define CVUI_IMPLEMENTATION
 // before the inclusion of cvui.h to ensure its implementaiton is compiled.
 #define CVUI_IMPLEMENTATION
+
 #include "cvui.h"
 
 using namespace std;
@@ -50,13 +52,13 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam
             z_value_short = src.at<short>(h, w);
 //            z_value_float = src.at<float>(h, w);
 
-            if (z_value_short > 0 || z_value_float >0.0) {
+            if (z_value_short > 0 || z_value_float > 0.0) {
                 Eigen::Vector3f v;
                 v = Eigen::Vector3f::Zero();
 
-                v.z() = (float)(z_value_short)/1000;
+                v.z() = (float) (z_value_short) / 1000;
 
-                if(v.z() == 0) continue;
+                if (v.z() == 0) continue;
                 v.x() = v.z() * (w - cam_p.cx) * (1.0 / cam_p.fx);
                 v.y() = v.z() * (h - cam_p.cy) * (1.0 / cam_p.fy);
 
@@ -73,14 +75,14 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam
 }
 
 /// 1shot
-void CaptureImageMode(ParameterManager cfg_param){
+void CaptureImageMode(ParameterManager cfg_param) {
 
     /// cvui GUI
     string WINDOW_NAME = "capture_mode";
 //    ParameterManager cfg_param(CFG_PARAM_PATH);
 
-    int window_width = cfg_param.ReadIntData("Camera", "image_width")*2;
-    int window_height = cfg_param.ReadIntData("Camera", "image_height")*2;
+    int window_width = cfg_param.ReadIntData("Camera", "image_width") * 2;
+    int window_height = cfg_param.ReadIntData("Camera", "image_height") * 2;
     int image_width = cfg_param.ReadIntData("Camera", "image_width");
     int image_height = cfg_param.ReadIntData("Camera", "image_height");
     int capture_fps = cfg_param.ReadIntData("Camera", "capture_fps");
@@ -97,30 +99,29 @@ void CaptureImageMode(ParameterManager cfg_param){
 
     PicoZenseSensorSetter pico_zense_setter;
     pico_zense_setter.initialize(image_width, image_height, capture_fps, option);
-    
+
     std::vector<SensorWrapper> sensors_pico;
     pico_zense_setter.setSensorObject(sensors_pico);
 
-    SensorManager sens_mng;  
+    SensorManager sens_mng;
     sens_mng.setIdxSerialMap(pico_zense_setter.bm_idx2serial);
     sens_mng.setSensors(sensors_pico);
     sens_mng.activateSensor(ZENSE_ID);
     sens_mng.start();
 
     /// default folder check
-    int mkdir_e = mkdir("../capture_tmp/" , 0777);
+    int mkdir_e = mkdir("../capture_tmp/", 0777);
     int file_count = -2; // "." ".."分をカウントから引く
-    DIR* dp=opendir("../capture_tmp/");
-    if (dp!=NULL)
-    {
-        struct dirent* dent;
-        do{
+    DIR *dp = opendir("../capture_tmp/");
+    if (dp != NULL) {
+        struct dirent *dent;
+        do {
             dent = readdir(dp);
-            if (dent!=NULL){
+            if (dent != NULL) {
 //                cout<<dent->d_name<<endl;
                 file_count++;
             }
-        }while(dent!=NULL);
+        } while (dent != NULL);
         closedir(dp);
     }
 
@@ -139,15 +140,15 @@ void CaptureImageMode(ParameterManager cfg_param){
     while (true) {
         frame = cv::Scalar(49, 52, 49);
         sens_mng.update();
-        
-        cv::Mat color, ir_left,  depth, depth_color;
+
+        cv::Mat color, ir_left, depth, depth_color;
         color = sens_mng.getRGBImage().clone();
-        depth = sens_mng.getDepthImage().clone(); 
-        ir_left = sens_mng.getIRImage().clone();  
-        
-        if(depth.rows == 0) continue;
-        if(ir_left.rows == 0) continue;
-        depth_color = sens_mng.getColorizedDepthImage();  
+        depth = sens_mng.getDepthImage().clone();
+        ir_left = sens_mng.getIRImage().clone();
+
+        if (depth.rows == 0) continue;
+        if (ir_left.rows == 0) continue;
+        depth_color = sens_mng.getColorizedDepthImage();
 
         /// display resize
         cv::Mat color_r, depth_color_r, depth_r, depth_convert;
@@ -162,11 +163,11 @@ void CaptureImageMode(ParameterManager cfg_param){
         /// pcd data
         pcl::PointCloud<pcl::PointXYZ>::Ptr point(new pcl::PointCloud<pcl::PointXYZ>);
 
-        
+
         point = Depth2Point(depth, camera_param);
 
         ///　1枚撮影(Button)
-        if (cvui::button(frame, 50, window_height - 300, 300, 100,  "Capture RGB/Depth Image")) {
+        if (cvui::button(frame, 50, window_height - 300, 300, 100, "Capture RGB/Depth Image")) {
 
             std::ostringstream oss;
             oss << std::setw(4) << std::setfill('0') << file_count;
@@ -181,7 +182,7 @@ void CaptureImageMode(ParameterManager cfg_param){
             cv::imwrite(color_name, color);
 
             Mat depth_write;
- //           depth.convertTo(depth_write, CV_8UC4, 1.0/1.0);
+            //           depth.convertTo(depth_write, CV_8UC4, 1.0/1.0);
 //            cv::Mat depth_write = Mat(depth.rows, depth.cols, CV_8UC4, depth.data);
             cv::imwrite(depth_name, depth);
             cv::imwrite(ir_name, ir_left);
@@ -210,7 +211,7 @@ void CaptureImageMode(ParameterManager cfg_param){
 }
 
 ///
-void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
+void ROSBugWirteMode(int argc, char **argv, ParameterManager cfg_param) {
 
     /// ROS Init
     ros::init(argc, argv, "ros_bug_mode");
@@ -220,8 +221,8 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
     string WINDOW_NAME = "capture_mode";
 //    ParameterManager cfg_param(CFG_PARAM_PATH);
 
-    int window_width = cfg_param.ReadIntData("Camera", "image_width")*2;
-    int window_height = cfg_param.ReadIntData("Camera", "image_height")*2;
+    int window_width = cfg_param.ReadIntData("Camera", "image_width") * 2;
+    int window_height = cfg_param.ReadIntData("Camera", "image_height") * 2;
     int image_width = cfg_param.ReadIntData("Camera", "image_width");
     int image_height = cfg_param.ReadIntData("Camera", "image_height");
     int capture_fps = cfg_param.ReadIntData("Camera", "capture_fps");
@@ -258,19 +259,18 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
     std::cout << "cy = " << camera_param.cy << std::endl;
 
     /// default folder check
-    int mkdir_e = mkdir("../capture_tmp/" , 0777);
+    int mkdir_e = mkdir("../capture_tmp/", 0777);
     int file_count = -2; // "." ".."分をカウントから引く
-    DIR* dp=opendir("../capture_tmp/");
-    if (dp!=NULL)
-    {
-        struct dirent* dent;
-        do{
+    DIR *dp = opendir("../capture_tmp/");
+    if (dp != NULL) {
+        struct dirent *dent;
+        do {
             dent = readdir(dp);
-            if (dent!=NULL){
+            if (dent != NULL) {
 //                cout<<dent->d_name<<endl;
                 file_count++;
             }
-        }while(dent!=NULL);
+        } while (dent != NULL);
         closedir(dp);
     }
 
@@ -283,13 +283,13 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
         frame = cv::Scalar(49, 52, 49);
         sens_mng.update();
 
-        cv::Mat color, ir_left,  depth, depth_color;
+        cv::Mat color, ir_left, depth, depth_color;
         color = sens_mng.getRGBImage().clone();
         depth = sens_mng.getDepthImage().clone();
         ir_left = sens_mng.getIRImage().clone();
 
-        if(depth.rows == 0) continue;
-        if(ir_left.rows == 0) continue;
+        if (depth.rows == 0) continue;
+        if (ir_left.rows == 0) continue;
         depth_color = sens_mng.getColorizedDepthImage();
 
         /// display resize
@@ -303,7 +303,7 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
         cvui::image(frame, image_width, 0, depth_color_r);
 
         ///　BugFile撮影(Button)
-        if (cvui::button(frame, 50, window_height - 300, 300, 100,  "Capture ROSBug data")) {
+        if (cvui::button(frame, 50, window_height - 300, 300, 100, "Capture ROSBug data")) {
 
             std::ostringstream oss;
             oss << std::setw(4) << std::setfill('0') << file_count;
@@ -323,8 +323,8 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
                 depth = sens_mng.getDepthImage().clone();
                 ir_left = sens_mng.getIRImage().clone();
 
-                if(depth.rows == 0) continue;
-                if(ir_left.rows == 0) continue;
+                if (depth.rows == 0) continue;
+                if (ir_left.rows == 0) continue;
                 depth_color = sens_mng.getColorizedDepthImage();
 
                 sensor_msgs::ImagePtr color_msg, depth_msg, depth_color_msg;
@@ -335,6 +335,11 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
                 bag.write("color", ros::Time::now(), color_msg);
                 bag.write("depth", ros::Time::now(), depth_msg);
                 bag.write("depth_color", ros::Time::now(), depth_color_msg);
+
+                std_msgs::Int32 image_frame;
+                image_frame.data = frame_tmp;
+                bag.write("image_frame", ros::Time::now(), image_frame);
+
 
                 /// msg->cv
 //                cv_bridge::CvImagePtr cv_ptr;
@@ -387,27 +392,111 @@ void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
     sens_mng.stop();
 }
 
+///
+void ROSBugReadMode(int argc, char **argv, ParameterManager cfg_param) {
+
+    /// parameter
+    int start_frame = cfg_param.ReadIntData("BugReadOption", "start_frame");
+    int end_frame = cfg_param.ReadIntData("BugReadOption", "end_frame");
+    string bag_name = cfg_param.ReadStringData("BugReadOption", "bug_file_path");
+
+    /// rosbag capture start
+    rosbag::Bag bag;
+    bag.open(bag_name, rosbag::bagmode::Read);
+
+    std::vector<std::string> topics;
+    topics.push_back(std::string("color"));
+    topics.push_back(std::string("depth_color"));
+    topics.push_back(std::string("depth"));
+    topics.push_back(std::string("image_frame"));
+    rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+    bool show_flag = true;
+    while (show_flag) {
+
+        int frame = 0;
+        for (rosbag::MessageInstance const m: view) {
+
+            if (m.getTopic() == "image_frame") {
+                std_msgs::Int32::ConstPtr i = m.instantiate<std_msgs::Int32>();
+
+                frame = i->data;
+            }
+
+            // check frame flag
+            if(frame < start_frame | frame > end_frame)
+                continue;
+            else
+                std::cout << "frame = " << frame << std::endl;
+
+
+            if (m.getTopic() == "color") {
+                sensor_msgs::Image::ConstPtr i = m.instantiate<sensor_msgs::Image>();
+
+                cv_bridge::CvImagePtr cv_ptr;
+                cv_ptr = cv_bridge::toCvCopy(i, sensor_msgs::image_encodings::TYPE_8UC3);
+
+                cv::imshow("color", cv_ptr->image);
+            }
+
+            if (m.getTopic() == "depth_color") {
+                sensor_msgs::Image::ConstPtr i = m.instantiate<sensor_msgs::Image>();
+
+                cv_bridge::CvImagePtr cv_ptr;
+                cv_ptr = cv_bridge::toCvCopy(i, sensor_msgs::image_encodings::TYPE_8UC3);
+
+                cv::imshow("depth_color", cv_ptr->image);
+            }
+
+            if (m.getTopic() == "depth") {
+                sensor_msgs::Image::ConstPtr i = m.instantiate<sensor_msgs::Image>();
+
+                cv_bridge::CvImagePtr cv_ptr;
+                cv_ptr = cv_bridge::toCvCopy(i, sensor_msgs::image_encodings::TYPE_16UC1);
+
+                cv::imshow("depth", cv_ptr->image);
+            }
+
+            // ROS time
+            // std::cout << "time = " << m.getTime() << std::endl;
+
+            if (cv::waitKey(20) == 27) {
+                show_flag = false;
+                break;
+            }
+        }
+    }
+
+    bag.close();
+
+}
 
 ///
 /// main
 ///
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
+
     ParameterManager cfg_param(CFG_PARAM_PATH);
 
-    std::cout << argv[1] << std::endl;
+    if(argc != 2) {
+        std::cout << "command option error !!" << std::endl;
+        return 0;
+    }
 
     string mode = argv[1];
 
-    if(mode == "rosbag"){
-        ROSBugMode(argc, argv, cfg_param);
+    if (mode == "rosbag") {
+        ROSBugWirteMode(argc, argv, cfg_param);
     }
-    else if(mode == "1shot"){
+    else if (mode == "rosbag_read") {
+        ROSBugReadMode(argc, argv, cfg_param);
+    }
+    else if (mode == "1shot") {
         CaptureImageMode(cfg_param);
     }
-    else{
-        std::cout << "command error !!" << std::endl;
+    else {
+        std::cout << "mode error !!" << std::endl;
     }
 
     return 0;
