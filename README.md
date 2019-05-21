@@ -1,13 +1,12 @@
-# memo
-
-- rosbag保存機能を作成中
-- ビルドはcatkin_makeでお願いします
-
-## 実行
+# 実行方法/補足
 - roscoreが必要です
 - アプリ実行時に引数「rosbag」を与えるとrosbag保存モードになります
 - アプリ実行時に引数「1shot」と入力すると従来の1枚撮影モードになります
+- アプリ実行時に引数「rosbag_read」と入力するとbagファイル再生モードになります
 
+cfgファイルについて  
+- 「ZenseOption」 --- Zense撮影時のオプションを設定。
+- 「BugReadOption」 --- bugファイル再生モード時のオプション。ファイルパスなど指定
 
 # 機能
 * 対となるRGB/Depth画像を撮影ボタンを押す毎に「capture_tmp」に順次保存  
