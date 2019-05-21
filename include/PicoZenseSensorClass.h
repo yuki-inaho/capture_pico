@@ -5,7 +5,12 @@
 class PicoZenseSensor{
 public:
 
-    void initialize(int32_t deviceIndex,  int _image_width, int _image_height, int _image_fps);
+    struct PicoZenseOption{
+        bool RGB_Map_Flag;
+        bool Depth_Map_Flag;
+    };
+
+    void initialize(int32_t deviceIndex,  int _image_width, int _image_height, int _image_fps, PicoZenseOption option);
     void update(int32_t deviceIndex);
     void start();//dummy
     void stop(int32_t deviceIndex);
@@ -28,3 +33,4 @@ private:
     SensorType type;
 
 };
+

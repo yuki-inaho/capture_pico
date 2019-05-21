@@ -4,15 +4,7 @@
 
 ### カメラ設定
 [Camera]
-###Pico Monstar
-# カメラ画像の横サイズ
-#image_width = 352 # int
-# カメラ画像の縦サイズ
-#image_height = 287 # int
-#capture_fps = 30 # int
-#sensor_id="0006-3904-0016-1711"
 
-###Pico Zense
 # カメラ画像の横サイズ
 image_width = 640 # int
 # カメラ画像の縦サイズ
@@ -23,4 +15,16 @@ theta_pitch = 30.0 # float
 # キャプチャーの速さ [fps]
 capture_fps = 30 # int
 sensor_type = "TOF"
-sensor_id = "PD7110CGC8210717W"
+#sensor_id = "PD7110CGC8210717W"
+sensor_id = "PD7110PGCC040119W"
+
+[ZenseOption]
+
+# color2depth Flag
+rgb_map = true
+#rgb_map = false
+
+# depth2color Flag
+#depth_map = true
+depth_map = false
+

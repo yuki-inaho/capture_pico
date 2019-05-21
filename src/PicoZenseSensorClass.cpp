@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void PicoZenseSensor::initialize(int32_t deviceIndex,  int _image_width, int _image_height, int _image_fps){
+void PicoZenseSensor::initialize(int32_t deviceIndex,  int _image_width, int _image_height, int _image_fps, PicoZenseSensor::PicoZenseOption _option){
 
     PsReturnStatus status;
 
@@ -88,16 +88,32 @@ void PicoZenseSensor::initialize(int32_t deviceIndex,  int _image_width, int _im
     frameMode.resolutionHeight = _image_height;
     PsSetFrameMode(deviceIndex, PsRGBFrame, &frameMode);
 
-    /// Mapped FLAG
-//    bool f_bMappedDepth = true;
-//    status = PsSetMapperEnabledRGBToDepth(deviceIndex, f_bMappedDepth);
-    bool f_bMappedRGB = true;
-    status = PsSetMapperEnabledDepthToRGB(deviceIndex, f_bMappedRGB);
+    /// Depth Map
+    bool f_bMappedDepth;
+    if(_option.Depth_Map_Flag == true){
+        f_bMappedDepth = true;
 
-    if (status != PsRetOK)
-    {
-        cout << "PsSetMapperEnabledRGBToDepth failed!" << endl;
-        return;
+        status = PsSetMapperEnabledRGBToDepth(deviceIndex, f_bMappedDepth);
+
+        if (status != PsRetOK)
+        {
+            cout << "PsSetMapperEnabledDepthToDRGB failed!" << endl;
+            return;
+        }
+    }
+
+    /// RGB Map
+    bool f_bMappedRGB;
+    if(_option.RGB_Map_Flag == true){
+        f_bMappedRGB = true;
+
+        status = PsSetMapperEnabledDepthToRGB(deviceIndex, f_bMappedRGB);
+
+        if (status != PsRetOK)
+        {
+            cout << "PsSetMapperEnabledRGBToDepth failed!" << endl;
+            return;
+        }
     }
 
     image_width = _image_width;

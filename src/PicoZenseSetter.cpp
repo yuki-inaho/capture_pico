@@ -3,7 +3,7 @@
 using namespace std;
 
 void
-PicoZenseSensorSetter::initialize(int _image_width, int _image_height, int _image_fps){
+PicoZenseSensorSetter::initialize(int _image_width, int _image_height, int _image_fps, PicoZenseSensor::PicoZenseOption _option){
     PsReturnStatus status;
     int32_t deviceCount = 0;
     status = PsGetDeviceCount(&deviceCount);
@@ -16,7 +16,7 @@ PicoZenseSensorSetter::initialize(int _image_width, int _image_height, int _imag
     n_sensor = deviceCount;
     for(int32_t device_index=0; device_index < n_sensor; device_index++ ){
         PicoZenseSensor _sensor;
-        _sensor.initialize(device_index, _image_width, _image_height, _image_fps);
+        _sensor.initialize(device_index, _image_width, _image_height, _image_fps, _option);
         pico_zense_sensor_list.push_back(_sensor);
 
         cout << "sensor number: " << device_index << endl;   

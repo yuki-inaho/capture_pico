@@ -6,7 +6,7 @@
 class PicoZenseSensorSetter{
 public:
 
-    void initialize(int _image_width, int _image_height, int _image_fps);
+    void initialize(int _image_width, int _image_height, int _image_fps, PicoZenseSensor::PicoZenseOption _option);
     void setSensorObject(std::vector<SensorWrapper> &_sensor_vec);
     int getNumSensor();
     bimap_t bm_idx2serial;

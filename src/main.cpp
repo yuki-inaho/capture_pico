@@ -73,11 +73,11 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam
 }
 
 /// 1shot
-void CaptureImageMode(){
+void CaptureImageMode(ParameterManager cfg_param){
 
     /// cvui GUI
     string WINDOW_NAME = "capture_mode";
-    ParameterManager cfg_param(CFG_PARAM_PATH);
+//    ParameterManager cfg_param(CFG_PARAM_PATH);
 
     int window_width = cfg_param.ReadIntData("Camera", "image_width")*2;
     int window_height = cfg_param.ReadIntData("Camera", "image_height")*2;
@@ -90,9 +90,13 @@ void CaptureImageMode(){
     cv::Mat frame = cv::Mat(window_height, window_width, CV_8UC3);
     cvui::init(WINDOW_NAME);
 
-    
+    /// Zense Option
+    PicoZenseSensor::PicoZenseOption option;
+    option.RGB_Map_Flag = cfg_param.ReadBoolData("ZenseOption", "rgb_map");
+    option.Depth_Map_Flag = cfg_param.ReadBoolData("ZenseOption", "depth_map");
+
     PicoZenseSensorSetter pico_zense_setter;
-    pico_zense_setter.initialize(image_width, image_height, capture_fps);
+    pico_zense_setter.initialize(image_width, image_height, capture_fps, option);
     
     std::vector<SensorWrapper> sensors_pico;
     pico_zense_setter.setSensorObject(sensors_pico);
@@ -206,7 +210,7 @@ void CaptureImageMode(){
 }
 
 ///
-void ROSBugMode(int argc, char** argv) {
+void ROSBugMode(int argc, char** argv, ParameterManager cfg_param) {
 
     /// ROS Init
     ros::init(argc, argv, "ros_bug_mode");
@@ -214,7 +218,7 @@ void ROSBugMode(int argc, char** argv) {
 
     /// CameraSetting
     string WINDOW_NAME = "capture_mode";
-    ParameterManager cfg_param(CFG_PARAM_PATH);
+//    ParameterManager cfg_param(CFG_PARAM_PATH);
 
     int window_width = cfg_param.ReadIntData("Camera", "image_width")*2;
     int window_height = cfg_param.ReadIntData("Camera", "image_height")*2;
@@ -227,8 +231,13 @@ void ROSBugMode(int argc, char** argv) {
     cv::Mat frame = cv::Mat(window_height, window_width, CV_8UC3);
     cvui::init(WINDOW_NAME);
 
+    /// Zense Option
+    PicoZenseSensor::PicoZenseOption option;
+    option.RGB_Map_Flag = cfg_param.ReadBoolData("ZenseOption", "rgb_map");
+    option.Depth_Map_Flag = cfg_param.ReadBoolData("ZenseOption", "depth_map");
+
     PicoZenseSensorSetter pico_zense_setter;
-    pico_zense_setter.initialize(image_width, image_height, capture_fps);
+    pico_zense_setter.initialize(image_width, image_height, capture_fps, option);
 
     std::vector<SensorWrapper> sensors_pico;
     pico_zense_setter.setSensorObject(sensors_pico);
@@ -385,15 +394,17 @@ void ROSBugMode(int argc, char** argv) {
 
 int main(int argc, char** argv)
 {
+    ParameterManager cfg_param(CFG_PARAM_PATH);
+
     std::cout << argv[1] << std::endl;
 
     string mode = argv[1];
 
     if(mode == "rosbag"){
-        ROSBugMode(argc, argv);
+        ROSBugMode(argc, argv, cfg_param);
     }
     else if(mode == "1shot"){
-        CaptureImageMode();
+        CaptureImageMode(cfg_param);
     }
     else{
         std::cout << "command error !!" << std::endl;
