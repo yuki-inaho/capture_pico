@@ -16,20 +16,18 @@ theta_pitch = 30.0 # float
 capture_fps = 30 # int
 sensor_type = "TOF"
 #sensor_id = "PD7110CGC8210717W"
-sensor_id = "PD7110PGCC040119W"
+sensor_id = "PD71A1CGD3280054P"
 
 [ZenseOption]
 
 # color2depth Flag
 rgb_map = true
 #rgb_map = false
-
 # depth2color Flag
 #depth_map = true
 depth_map = false
 
 [BugReadOption]
-
-bug_file_path = "../capture_tmp/bag_0000.bag"
+bug_file_path = "../capture_tmp/bag_0005.bag"
 start_frame = 0
 end_frame = 500

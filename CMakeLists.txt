@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 # project set
-set(PROJ_NAME capture_zense)
+set(PROJ_NAME capture_zense_vertical)
 project(${PROJ_NAME})
 set(SOURCE_CODE
         src/main.cpp
@@ -31,10 +31,10 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(capture_zense ${SOURCE_CODE})
+add_executable(capture_zense_vertical ${SOURCE_CODE})
 
-add_dependencies(capture_zense ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(capture_zense
+add_dependencies(capture_zense_vertical ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(capture_zense_vertical
         ${catkin_LIBRARIES}
         )
 

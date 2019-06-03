@@ -29,7 +29,7 @@ using namespace std;
 using namespace cv;
 
 std::string HOME_PATH = std::getenv("HOME");
-std::string CFG_PARAM_PATH = HOME_PATH + "/catkin_ws/src/capture_zense/cfg/recognition_parameter.toml";
+std::string CFG_PARAM_PATH = HOME_PATH + "/catkin_ws/src/capture_zense_vertical/cfg/recognition_parameter.toml";
 
 // One (and only one) of your C++ files must define CVUI_IMPLEMENTATION
 // before the inclusion of cvui.h to ensure its implementaiton is compiled.
@@ -39,6 +39,8 @@ std::string CFG_PARAM_PATH = HOME_PATH + "/catkin_ws/src/capture_zense/cfg/recog
 
 using namespace std;
 
+
+/// Depth -> Point
 
 /// Depth -> Point
 pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam_p) {
@@ -59,8 +61,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam
                 v.z() = (float) (z_value_short) / 1000;
 
                 if (v.z() == 0) continue;
-                v.x() = v.z() * (w - cam_p.cx) * (1.0 / cam_p.fx);
-                v.y() = v.z() * (h - cam_p.cy) * (1.0 / cam_p.fy);
+                v.x() = v.z() * (w - cam_p.cy) * (1.0 / cam_p.fy);
+                v.y() = v.z() * (h - cam_p.cx) * (1.0 / cam_p.fx);
 
                 pcl::PointXYZ point_tmp;
                 point_tmp.x = v.x();
@@ -73,7 +75,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Depth2Point(cv::Mat src, CameraParameter cam
 
     return cloud;
 }
-
 /// 1shot
 void CaptureImageMode(ParameterManager cfg_param) {
 
@@ -143,27 +144,29 @@ void CaptureImageMode(ParameterManager cfg_param) {
 
         cv::Mat color, ir_left, depth, depth_color;
         color = sens_mng.getRGBImage().clone();
+        cv::rotate(color, color, cv::ROTATE_90_CLOCKWISE);
         depth = sens_mng.getDepthImage().clone();
+        cv::rotate(depth, depth, cv::ROTATE_90_CLOCKWISE);
         ir_left = sens_mng.getIRImage().clone();
+        cv::rotate(ir_left, ir_left, cv::ROTATE_90_CLOCKWISE);        
 
         if (depth.rows == 0) continue;
         if (ir_left.rows == 0) continue;
         depth_color = sens_mng.getColorizedDepthImage();
+        cv::rotate(depth_color, depth_color, cv::ROTATE_90_CLOCKWISE);
 
         /// display resize
         cv::Mat color_r, depth_color_r, depth_r, depth_convert;
-        cv::resize(color, color_r, cv::Size(image_width, image_height));
-        cv::resize(depth_color, depth_color_r, cv::Size(image_width, image_height));
+        cv::resize(color, color_r, cv::Size(image_height, image_width));
+        cv::resize(depth_color, depth_color_r, cv::Size(image_height, image_width));
 
 //        cv::cvtColor(ir_left,ir_left,cv::COLOR_GRAY2RGB);
 
         cvui::image(frame, 0, 0, color_r);
-        cvui::image(frame, image_width, 0, depth_color_r);
+        cvui::image(frame, image_height, 0, depth_color_r);
 
         /// pcd data
         pcl::PointCloud<pcl::PointXYZ>::Ptr point(new pcl::PointCloud<pcl::PointXYZ>);
-
-
         point = Depth2Point(depth, camera_param);
 
         ///　1枚撮影(Button)
@@ -285,22 +288,26 @@ void ROSBugWirteMode(int argc, char **argv, ParameterManager cfg_param) {
 
         cv::Mat color, ir_left, depth, depth_color;
         color = sens_mng.getRGBImage().clone();
+        cv::rotate(color, color, cv::ROTATE_90_CLOCKWISE);
         depth = sens_mng.getDepthImage().clone();
+        cv::rotate(depth, depth, cv::ROTATE_90_CLOCKWISE);
         ir_left = sens_mng.getIRImage().clone();
+        cv::rotate(ir_left, ir_left, cv::ROTATE_90_CLOCKWISE);        
 
         if (depth.rows == 0) continue;
         if (ir_left.rows == 0) continue;
         depth_color = sens_mng.getColorizedDepthImage();
+        cv::rotate(depth_color, depth_color, cv::ROTATE_90_CLOCKWISE);
 
         /// display resize
         cv::Mat color_r, depth_color_r, depth_r, depth_convert;
-        cv::resize(color, color_r, cv::Size(image_width, image_height));
-        cv::resize(depth_color, depth_color_r, cv::Size(image_width, image_height));
+        cv::resize(color, color_r, cv::Size(image_height, image_width));
+        cv::resize(depth_color, depth_color_r, cv::Size(image_height, image_width));
 
 //        cv::cvtColor(ir_left,ir_left,cv::COLOR_GRAY2RGB);
 
         cvui::image(frame, 0, 0, color_r);
-        cvui::image(frame, image_width, 0, depth_color_r);
+        cvui::image(frame, image_height, 0, depth_color_r);
 
         ///　BugFile撮影(Button)
         if (cvui::button(frame, 50, window_height - 300, 300, 100, "Capture ROSBug data")) {
@@ -320,12 +327,16 @@ void ROSBugWirteMode(int argc, char **argv, ParameterManager cfg_param) {
 
                 sens_mng.update();
                 color = sens_mng.getRGBImage().clone();
+                cv::rotate(color, color, cv::ROTATE_90_CLOCKWISE);
                 depth = sens_mng.getDepthImage().clone();
+                cv::rotate(depth, depth, cv::ROTATE_90_CLOCKWISE);
                 ir_left = sens_mng.getIRImage().clone();
+                cv::rotate(ir_left, ir_left, cv::ROTATE_90_CLOCKWISE);        
 
                 if (depth.rows == 0) continue;
                 if (ir_left.rows == 0) continue;
                 depth_color = sens_mng.getColorizedDepthImage();
+                cv::rotate(depth_color, depth_color, cv::ROTATE_90_CLOCKWISE);
 
                 sensor_msgs::ImagePtr color_msg, depth_msg, depth_color_msg;
                 color_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", color).toImageMsg();
@@ -356,8 +367,8 @@ void ROSBugWirteMode(int argc, char **argv, ParameterManager cfg_param) {
                 frame_tmp++;
 
                 /// tmp window display
-                cv::resize(color, color_r, cv::Size(image_width, image_height));
-                cv::resize(depth_color, depth_color_r, cv::Size(image_width, image_height));
+                cv::resize(color, color_r, cv::Size(image_height, image_width));
+                cv::resize(depth_color, depth_color_r, cv::Size(image_height, image_width));
                 cv::imshow("color", color_r);
                 cv::imshow("depth_color", depth_color_r);
 
