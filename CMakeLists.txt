@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5.1)
 
 # project set
-set(PROJ_NAME capture_zense_vertical)
+set(PROJ_NAME capture_flexx)
 project(${PROJ_NAME})
 set(SOURCE_CODE
         src/main.cpp
-        src/PicoZenseSensorClass.cpp
-        src/PicoZenseSetter.cpp
+        src/PicoSensorClass.cpp
+        src/PicoSensorSetter.cpp
         src/ParameterManager.cpp
         src/SensorManager.cpp
     )
@@ -16,14 +16,14 @@ set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
-        std_msgs
         rosbag
         cv_bridge
+        std_msgs
         )
 
 catkin_package(
         INCLUDE_DIRS include
-        CATKIN_DEPENDS roscpp rospy std_msgs rosbag cv_bridge
+        CATKIN_DEPENDS roscpp rospy rosbag cv_bridge std_msgs 
 )
 
 include_directories(
@@ -31,10 +31,10 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(capture_zense_vertical ${SOURCE_CODE})
+add_executable(capture_flexx ${SOURCE_CODE})
 
-add_dependencies(capture_zense_vertical ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(capture_zense_vertical
+add_dependencies(capture_flexx ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(capture_flexx
         ${catkin_LIBRARIES}
         )
 
@@ -48,6 +48,6 @@ find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 target_link_libraries(${PROJ_NAME} ${PCL_LIBRARIES})
 
-pkg_check_modules(PicoZense libpicozense REQUIRED)
-include_directories(${PicoZense_INCLUDE_DIRS})
-target_link_libraries(${PROJ_NAME} ${PicoZense_LDFLAGS})
+pkg_check_modules(Royale libroyale REQUIRED)
+include_directories(${Royale_INCLUDE_DIRS})
+target_link_libraries(${PROJ_NAME} ${Royale_LDFLAGS})

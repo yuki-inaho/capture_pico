@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>capture_zense_vertical</name>
+  <name>capture_flexx</name>
   <version>0.0.0</version>
-  <description>capture_zense_vertical package</description>
+  <description>capture_flexx package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
