@@ -19,6 +19,6 @@ sensor_id = "0007-0307-0107-1314"
 
 [BugReadOption]
 #bug_file_path = "../capture_tmp/bag_0005.bag"
-bug_file_path = "/home/inaho-00/デスクトップ/0603/capture_tmp/bag_0151.bag"
+bug_file_path = "/home/inaho-00/catkin_ws/devel/lib/capture_tmp/bag_0001.bag"
 start_frame = 0
 end_frame = 500

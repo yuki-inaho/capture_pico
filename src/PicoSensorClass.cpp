@@ -118,6 +118,7 @@ cv::Mat
 PicoSensor::getRGBImage(PicoListener &listener){
     cv::Mat _RGB;
     _RGB = listener.getGrayMat().clone();
+    _RGB.convertTo (_RGB, CV_8UC1);
     if(_RGB.rows != 0)cv::cvtColor(_RGB, _RGB, COLOR_GRAY2RGB);
     return _RGB;
 }
